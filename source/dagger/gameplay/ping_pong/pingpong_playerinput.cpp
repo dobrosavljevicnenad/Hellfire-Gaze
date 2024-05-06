@@ -1,6 +1,7 @@
 #include "pingpong_playerinput.h"
 
 #include "core/engine.h"
+#include "core/audio.h"
 #include "core/game/transforms.h"
 #include "core/graphics/sprite.h"
 #include "bullethell_bullet.h"
@@ -169,6 +170,7 @@ void PingPongPlayerInputSystem::Run()
             sprite.scale = {5,5};
             sprite.rotation = glm::degrees(movData.angle) + 90.f;
             Logger::info("Bullet");
+            Engine::GetDefaultResource<Audio>()->Play("bullet_fire");
         }
 
     }

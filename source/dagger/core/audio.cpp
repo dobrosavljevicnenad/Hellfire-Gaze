@@ -23,12 +23,12 @@ void Audio::Initialize() {
 
 void Audio::Load(AssetLoadRequest<Sound> request_)
 {
+
     FilePath path{ request_.path };
     String name = path.stem().string();
     auto& sounds = Engine::Res<Sound>();
 
-    if (!sounds.contains(name))
-        sounds[name] = new Sound();
+
 
     FilePath root{ request_.path };
     root.remove_filename();
@@ -37,16 +37,22 @@ void Audio::Load(AssetLoadRequest<Sound> request_)
     {
         String pathName = root.append(path.stem().string()).string();
         if (pathName.find("sounds") == 0)
-            pathName = pathName.substr(7, pathName.length() - 15);
+            pathName = pathName.substr(7, pathName.length() - 4);
 
         std::replace(pathName.begin(), pathName.end(), '/', ':');
         std::replace(pathName.begin(), pathName.end(), '\\', ':');
         soundName = pathName;
     }
 
+    if (!sounds.contains(soundName))
+        sounds[soundName] = new Sound();
     auto* sound = sounds[soundName];
+
     sound->name = soundName;
+    Logger::info("Loading {}", request_.path.c_str());
     sound->path = request_.path;
+
+    Logger::info("Loaded sound {}", sound->name);
 }
 
 // Callback function called by MiniAudio when the sound playback ends
@@ -103,6 +109,7 @@ void Audio::PlayLoop(String name_)
     Logger::info("Loaded {} {}", name_, sounds[name_]->path.c_str());
     active_sounds[name_].insert(masound);
     ma_sound_set_looping(masound, true);
+    ma_sound_set_volume(masound, 0.3f);
     ma_sound_start(masound);
 //    ma_sound_set_end_callback(masound, &onSoundEnded, NULL);
 

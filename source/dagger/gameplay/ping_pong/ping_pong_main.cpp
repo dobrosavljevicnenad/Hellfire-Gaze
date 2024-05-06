@@ -12,6 +12,7 @@
 #include "core/graphics/textures.h"
 #include "core/graphics/animations.h"
 #include "core/graphics/gui.h"
+#include "core/audio.h"
 #include "tools/diagnostics.h"
 
 #include "gameplay/common/simple_collisions.h"
@@ -55,6 +56,7 @@ void PingPongGame::CoreSystemsSetup()
     auto& engine = Engine::Instance();
 
     engine.AddSystem<WindowSystem>();
+    engine.AddSystem<AudioSystem>();
     engine.AddSystem<InputSystem>();
     engine.AddSystem<ShaderSystem>();
     engine.AddSystem<TextureSystem>();
@@ -97,6 +99,8 @@ void PingPongGame::WorldSetup()
     camera->Update();
 
     SetupWorld();
+
+    Engine::GetDefaultResource<Audio>()->PlayLoop("battle_music");
 }
 
 void ping_pong::SetupWorld()
@@ -185,6 +189,7 @@ void ping_pong::SetupWorld()
 
         auto& dmg = reg.emplace<Damageable>(entity);
         dmg.hurtDuration = .2f;
+        dmg.hurtSound = "eye_hurt";
 
         auto& sprite = reg.emplace<Sprite>(entity);
         AssignSprite(sprite, "bullet_hell:eye:IDLE:idle1");
@@ -200,6 +205,8 @@ void ping_pong::SetupWorld()
 
     // add score system to count scores for left and right collisions
     PlayerScoresSystem::SetFieldSize(width, height, tileSize * (1 + Space));
+
+
 }
 
 

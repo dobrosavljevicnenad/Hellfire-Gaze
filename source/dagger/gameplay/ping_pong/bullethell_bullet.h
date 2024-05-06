@@ -22,6 +22,7 @@ namespace ping_pong{
         bool isDamageable{true};
         float lastDamaged{0.f};
         float hurtDuration{0.1f};
+        std::string hurtSound{"eye_hurt"};
     };
 
     struct DamageEvent{

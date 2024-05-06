@@ -53,6 +53,17 @@ Any kind of data used by engine that is not source code is considered a resource
 and so all references to resoruces begin there. For example, if you want to get a texture (from `data\textures`) you would
 use `textures\mytexture.png` instead `data\textures\mytexture.png`.
 
+
+## Assets used
+
+### Sound
+https://fallenblood.itch.io/50-sfx
+https://kronbits.itch.io/freesfx
+https://xdeviruchi.itch.io/8-bit-fantasy-adventure-music-pack
+https://jdwasabi.itch.io/8-bit-16-bit-sound-effects-pack
+
+### Sprites
+
 ## Rights and Reservations
 
 Dagger is made as a part of Ubisoft Belgrade's game development course. All rights reserved.

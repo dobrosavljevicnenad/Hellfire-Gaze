@@ -6,6 +6,7 @@
 #include "gameplay/ping_pong/pingpong_playerinput.h"
 #include "gameplay/common/simple_collisions.h"
 #include "core/graphics/sprite.h"
+#include "core/audio.h"
 
 
 using namespace ping_pong;
@@ -41,7 +42,9 @@ void DamageSystem::OnDamageEvent(DamageEvent dEvent) {
 
         auto targetSprite = Engine::Registry().try_get<Sprite>(dEvent.target);
         auto targetDamageable = Engine::Registry().try_get<Damageable>(dEvent.target);
+
         if(targetSprite && targetDamageable){
+            Engine::GetDefaultResource<Audio>()->Play(targetDamageable->hurtSound);
             targetSprite->color = {1,0,0, 1};
             targetDamageable->lastDamaged = targetDamageable->hurtDuration;
         }
