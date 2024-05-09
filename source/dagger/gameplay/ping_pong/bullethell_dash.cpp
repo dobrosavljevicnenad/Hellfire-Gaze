@@ -13,7 +13,9 @@ void ping_pong::DashSystem::Run() {
         auto& dash = Engine::Registry().get<DashData>(entity);
         auto& mov = Engine::Registry().get<MovementData>(entity);
         auto& ctrl = Engine::Registry().get<ControllerMapping>(entity);
-
+        if (dash.canDash && std::abs(ctrl.doubleTap.x) < 1e-4){
+            dash.canDash = false;
+        }
         float boost = ctrl.doubleTap.x * dash.boost;
 //        if(dash.canDash && std::abs(ctrl.doubleTap.x) < 1e-4)
 //            dash.canDash = false;
@@ -25,7 +27,7 @@ void ping_pong::DashSystem::Run() {
             Engine::GetDefaultResource<Audio>()->Play("dash_reload");
         }
 
-        if(!dash.canDash && std::abs(dash.dashTimer - dash.dashCooldown) < 1e-4){
+        if(!dash.canDash && dash.dashTimer == dash.dashCooldown){
             dash.canDash = true;
         }
 
