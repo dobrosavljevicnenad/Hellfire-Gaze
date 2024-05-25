@@ -9,6 +9,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "gameplay/common/simple_collisions.h"
+#include "core/graphics/animation.h"
 #include <GLFW/glfw3.h>
 
 using namespace dagger;
@@ -103,12 +104,13 @@ void PingPongPlayerInputSystem::OnKeyboardEvent(KeyboardEvent kEvent_)
 
 void PingPongPlayerInputSystem::Run()
 {
-    auto view = Engine::Registry().view<Transform, ControllerMapping, MovementData, Sprite>();
+    auto view = Engine::Registry().view<Transform, ControllerMapping, MovementData, Sprite, Animator>();
     for (auto entity : view)
     {
         auto &t = view.get<Transform>(entity);
         auto &ctrl = view.get<ControllerMapping>(entity);
         auto &mov = view.get<MovementData>(entity);
+        auto& anim = view.get<Animator>(entity);
 
         mov.acceleration += ctrl.input.x * s_PlayerSpeed * Engine::DeltaTime();
 
@@ -121,6 +123,13 @@ void PingPongPlayerInputSystem::Run()
                 mov.acceleration = 0.0f;
         }
 
+        if(ctrl.input.x < 0){
+            AnimatorPlay(anim, "bullet_hell:player:LEFT");
+        }else if(ctrl.input.x > 0){
+            AnimatorPlay(anim, "bullet_hell:player:RIGHT");
+        }else{
+            AnimatorPlay(anim, "bullet_hell:player:IDLE");
+        }
         mov.angle += ctrl.input.x * s_PlayerSpeed * Engine::DeltaTime();
 
         ctrl.doubleTap.x *= 0.9;
@@ -130,7 +139,8 @@ void PingPongPlayerInputSystem::Run()
 //        ctrl.doubleTap.x = 0;
 
         auto &spr = view.get<Sprite>(entity);
-        spr.rotation = mov.radius* mov.angle;
+//        spr.rotation = mov.radius* mov.angle;
+            spr.rotation = glm::degrees(mov.angle) + 90.f;
 //        if(mov.angle >= 360.0){
 //            mov.angle -= 360.0;
 //        }
@@ -165,7 +175,7 @@ void PingPongPlayerInputSystem::Run()
             bulletData.velocity = glm::normalize(dir);
             bulletData.velocity *= 500;
             bulletData.owner = playerView.front();
-            AssignSprite(sprite, "EmptyWhitePixel");
+            AssignSprite(sprite, "spritesheets:touhou:blue_yin_yang");
             sprite.size = {1, 1};
             sprite.scale = {5,5};
             sprite.rotation = glm::degrees(movData.angle) + 90.f;

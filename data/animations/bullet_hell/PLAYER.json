@@ -1,0 +1,15 @@
+{
+  "animation-name": "bullet_hell:player:IDLE",
+  "animation-length-ms": 1000,
+  "animation-frames":
+  [
+    { "texture-name": "spritesheets:touhou:reimu_idle_anim:1" },
+    { "texture-name": "spritesheets:touhou:reimu_idle_anim:2" },
+    { "texture-name": "spritesheets:touhou:reimu_idle_anim:3" },
+    { "texture-name": "spritesheets:touhou:reimu_idle_anim:4" },
+    { "texture-name": "spritesheets:touhou:reimu_idle_anim:5" },
+    { "texture-name": "spritesheets:touhou:reimu_idle_anim:6" },
+    { "texture-name": "spritesheets:touhou:reimu_idle_anim:7" },
+    { "texture-name": "spritesheets:touhou:reimu_idle_anim:8" }
+  ]
+}

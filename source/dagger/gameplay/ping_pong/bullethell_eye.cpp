@@ -101,6 +101,8 @@ void EyeSystem::Run() {
                         auto &col = playerView.get<SimpleCollision>(playerView.front());
                         reg.emplace<SimpleCollision>(bullet);
 
+
+
                         float step = 2 * M_PI / spawn_point_count;
                         auto spawn_point = rotateVector(rotated_vector, i * M_PI_2);
                         auto direction = Vector3(spawn_point, 0);
@@ -111,7 +113,7 @@ void EyeSystem::Run() {
                         bulletData.velocity = glm::normalize(direction);
                         bulletData.velocity *= 200;
                         bulletData.owner = eyeView.front();
-                        AssignSprite(sprite, "EmptyWhitePixel");
+                        AssignSprite(sprite, "spritesheets:touhou:red_bullet");
                         sprite.size = {3, 3};
                         sprite.scale = {5, 5};
                     }
@@ -141,7 +143,7 @@ void EyeSystem::Run() {
                         bulletData.velocity = glm::normalize(direction);
                         bulletData.velocity *= 200;
                         bulletData.owner = eyeView.front();
-                        AssignSprite(sprite, "EmptyWhitePixel");
+                        AssignSprite(sprite, "spritesheets:touhou:red_bullet");
                         sprite.size = {3, 3};
                         sprite.scale = {5, 5};
                     }
@@ -171,7 +173,7 @@ void EyeSystem::Run() {
                         bulletData.velocity = glm::normalize(direction);
                         bulletData.velocity *= 200;
                         bulletData.owner = eyeView.front();
-                        AssignSprite(sprite, "EmptyWhitePixel");
+                        AssignSprite(sprite, "spritesheets:touhou:red_bullet");
                         sprite.size = {3, 3};
                         sprite.scale = {5, 5};
                     }

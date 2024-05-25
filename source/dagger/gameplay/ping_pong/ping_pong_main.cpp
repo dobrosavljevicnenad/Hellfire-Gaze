@@ -16,10 +16,7 @@
 #include "tools/diagnostics.h"
 
 #include "gameplay/common/simple_collisions.h"
-#include "gameplay/ping_pong/pingpong_ball.h"
-#include "gameplay/ping_pong/player_scores.h"
 #include "gameplay/ping_pong/pingpong_playerinput.h"
-#include "gameplay/ping_pong/pingpong_tools.h"
 #include "gameplay/ping_pong/bullethell_eye.h"
 #include "gameplay/ping_pong/bullethell_bullet.h"
 #include "gameplay/ping_pong/bullethell_bar.h"
@@ -29,27 +26,6 @@
 using namespace dagger;
 using namespace ping_pong;
 
-void ping_pong::CreatePingPongBall(float tileSize_, ColorRGBA color_, Vector3 speed_, Vector3 pos_)
-{
-    auto& reg = Engine::Registry();
-    auto entity = reg.create();
-    auto& sprite = reg.emplace<Sprite>(entity);
-    AssignSprite(sprite, "PingPong:ball");
-    sprite.size = Vector2(1, 1) * tileSize_;
-
-    sprite.color = color_;
-
-    auto& transform = reg.emplace<Transform>(entity);
-    transform.position = pos_ * tileSize_;
-    transform.position.z = pos_.z;
-    auto& ball = reg.emplace<PingPongBall>(entity);
-    ball.speed = speed_ * tileSize_;
-
-    auto& col = reg.emplace<SimpleCollision>(entity);
-    col.size.x = tileSize_;
-    col.size.y = tileSize_;
-
-}
 
 void PingPongGame::CoreSystemsSetup()
 {
@@ -63,10 +39,7 @@ void PingPongGame::CoreSystemsSetup()
     engine.AddSystem<SpriteRenderSystem>();
     engine.AddPausableSystem<TransformSystem>();
     engine.AddPausableSystem<AnimationSystem>();
-    engine.AddSystem<DamageSystem>();
-    engine.AddSystem<BulletSystem>();
-    engine.AddSystem<BarSystem>();
-    engine.AddSystem<DashSystem>();
+
 #if !defined(NDEBUG)
     engine.AddSystem<DiagnosticSystem>();
     engine.AddSystem<GUISystem>();
@@ -79,13 +52,15 @@ void PingPongGame::GameplaySystemsSetup()
     auto& engine = Engine::Instance();
 
     engine.AddPausableSystem<SimpleCollisionsSystem>();
-    engine.AddPausableSystem<PingPongBallSystem>();
     engine.AddPausableSystem<PingPongPlayerInputSystem>();
-    engine.AddPausableSystem<PlayerScoresSystem>();
     engine.AddPausableSystem<EyeSystem>();
+    engine.AddPausableSystem<DamageSystem>();
+    engine.AddPausableSystem<BulletSystem>();
+    engine.AddPausableSystem<BarSystem>();
+    engine.AddPausableSystem<DashSystem>();
 
 #if defined(DAGGER_DEBUG)
-    engine.AddPausableSystem<PingPongTools>();
+
 #endif //defined(DAGGER_DEBUG)
 }
 
@@ -117,6 +92,8 @@ void ping_pong::SetupWorld()
     constexpr int height = 20;
     constexpr int width = 26;
     constexpr float tileSize = 20.f;// / static_cast<float>(Width);
+    constexpr float player_width = 32.f;
+    constexpr float player_height = 48.f;
 
 //    float zPos = 1.f;
 
@@ -134,8 +111,8 @@ void ping_pong::SetupWorld()
     {
         auto entity = reg.create();
         auto& col = reg.emplace<SimpleCollision>(entity);
-        col.size.x = tileSize;
-        col.size.y = tileSize;
+        col.size.x = 20;
+        col.size.y = 20;
 
         auto& transform = reg.emplace<Transform>(entity);
         transform.position.x = 0;
@@ -143,9 +120,12 @@ void ping_pong::SetupWorld()
         transform.position.z = zPos;
 
         auto& sprite = reg.emplace<Sprite>(entity);
-        AssignSprite(sprite, "EmptyWhitePixel");
-        sprite.size.x = tileSize;
-        sprite.size.y = tileSize;
+        AssignSprite(sprite, "spritesheets:touhou:reimu_idle_anim:1");
+        sprite.size.x = player_width;
+        sprite.size.y = player_height;
+
+        auto &anim = reg.emplace<Animator>(entity);
+        AnimatorPlay(anim, "bullet_hell:player:IDLE");
 //        sprite.scale = {10, 1};
         reg.emplace<EyeTarget>(entity);
 
@@ -161,6 +141,7 @@ void ping_pong::SetupWorld()
         createBar(&dash.dashTimer, {-250, -180, 0}, 200, 50, {0,0,1,1}, dash.dashCooldown);
 
         auto& stats = reg.emplace<StatsData>(entity);
+        stats.hp = 5;
 
         createBar(&stats.hp, {-250, -250, 0}, 200, 50, {1,0,0,1}, stats.hp);
 
@@ -203,8 +184,6 @@ void ping_pong::SetupWorld()
     }
 
 
-    // add score system to count scores for left and right collisions
-    PlayerScoresSystem::SetFieldSize(width, height, tileSize * (1 + Space));
 
 
 }
