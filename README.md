@@ -67,13 +67,14 @@ use `textures\mytexture.png` instead `data\textures\mytexture.png`.
 ## Assets used
 
 ### Sound
-https://fallenblood.itch.io/50-sfx
-https://kronbits.itch.io/freesfx
-https://xdeviruchi.itch.io/8-bit-fantasy-adventure-music-pack
-https://jdwasabi.itch.io/8-bit-16-bit-sound-effects-pack
+- https://fallenblood.itch.io/50-sfx 
+- https://kronbits.itch.io/freesfx 
+- https://xdeviruchi.itch.io/8-bit-fantasy-adventure-music-pack 
+- https://jdwasabi.itch.io/8-bit-16-bit-sound-effects-pack 
+- https://www.youtube.com/watch?v=195XntreoMc 
 
 ### Sprites
-https://www.spriters-resource.com/pc_computer/touhoufuujinrokumountainoffaith/sheet/51905/
+- https://www.spriters-resource.com/pc_computer/touhoufuujinrokumountainoffaith/sheet/51905/
 
 ## Rights and Reservations
 
