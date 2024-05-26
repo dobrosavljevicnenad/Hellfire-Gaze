@@ -63,6 +63,7 @@ https://xdeviruchi.itch.io/8-bit-fantasy-adventure-music-pack
 https://jdwasabi.itch.io/8-bit-16-bit-sound-effects-pack
 
 ### Sprites
+https://www.spriters-resource.com/pc_computer/touhoufuujinrokumountainoffaith/sheet/51905/
 
 ## Rights and Reservations
 
