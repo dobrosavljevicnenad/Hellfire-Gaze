@@ -8,6 +8,16 @@ A fully-featured, modern game engine made for educational purposes.
 - Dagger is extremely modular.
 - Dagger is clear and clearly educational.
 
+  
+
+
+
+https://github.com/igorkandic/UbiBelPMF_2024/assets/10564596/8ca6d072-ee93-41b5-b7ea-a2f1a431f04a
+
+
+
+
+
 ## Installation
 
 You can clone and fully set up this project by simply running:
