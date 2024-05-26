@@ -77,7 +77,7 @@ void PingPongGame::WorldSetup()
     camera->Update();
 
     SetupWorld();
-    Engine::GetDefaultResource<Audio>()->PlayLoop("battle_music");
+    Engine::GetDefaultResource<Audio>()->PlayLoop("battle_music2");
 }
 
 void ping_pong::SetupWorld()
