@@ -43,7 +43,7 @@ Entity ping_pong::createBar(float *toTrack, Vector3 position, int width, int hei
     AssignSprite(outerSprite, "EmptyWhitePixel");
     outerSprite.size = {width + 10, height + 10};
     outerSprite.position = transform.position;
-    outerSprite.position.z = 1;
+    outerSprite.position.z = 2;
 
 
     auto& innerSprite = reg.emplace<Sprite>(inner);
@@ -51,7 +51,7 @@ Entity ping_pong::createBar(float *toTrack, Vector3 position, int width, int hei
     AssignSprite(innerSprite, "EmptyWhitePixel");
     innerSprite.size = {width, height};
     innerSprite.position = transform.position;
-    innerSprite.position.z = 0;
+    innerSprite.position.z = 1;
 
     bar.inner = inner;
     bar.outer = outer;

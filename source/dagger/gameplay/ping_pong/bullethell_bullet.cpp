@@ -7,6 +7,8 @@
 #include "gameplay/common/simple_collisions.h"
 #include "core/graphics/sprite.h"
 #include "core/audio.h"
+#include "bullethell_eye.h"
+#include "bullethell_gamemanager.h"
 
 
 using namespace ping_pong;
@@ -37,6 +39,16 @@ void DamageSystem::OnDamageEvent(DamageEvent dEvent) {
     if(stats){
         Logger::info("Damage " + std::to_string(dEvent.damageAmount));
         stats->hp -= dEvent.damageAmount;
+        if(stats->hp <= 0)
+            stats->isDead = true;
+        auto eye = Engine::Registry().try_get<Eye>(dEvent.target);
+        if(eye){
+            auto mgr_view = Engine::Registry().view<GameManager>();
+            for(auto &mgr : mgr_view){
+                auto& manager = Engine::Registry().get<GameManager>(mgr);
+                manager.score+= dEvent.damageAmount;
+            }
+        }
         Logger::info("HP: " + std::to_string(stats->hp));
         Engine::Registry().destroy(dEvent.owner);
 
@@ -44,7 +56,7 @@ void DamageSystem::OnDamageEvent(DamageEvent dEvent) {
         auto targetDamageable = Engine::Registry().try_get<Damageable>(dEvent.target);
 
         if(targetSprite && targetDamageable){
-            Engine::GetDefaultResource<Audio>()->Play(targetDamageable->hurtSound);
+//            Engine::GetDefaultResource<Audio>()->Play(targetDamageable->hurtSound);
             targetSprite->color = {1,0,0, 1};
             targetDamageable->lastDamaged = targetDamageable->hurtDuration;
         }

@@ -13,6 +13,7 @@
 #include "core/graphics/animations.h"
 #include "core/graphics/gui.h"
 #include "core/audio.h"
+#include "core/graphics/text.h"
 #include "tools/diagnostics.h"
 
 #include "gameplay/common/simple_collisions.h"
@@ -21,6 +22,7 @@
 #include "gameplay/ping_pong/bullethell_bullet.h"
 #include "gameplay/ping_pong/bullethell_bar.h"
 #include "gameplay/ping_pong/bullethell_dash.h"
+#include "gameplay/ping_pong/bullethell_gamemanager.h"
 
 
 using namespace dagger;
@@ -52,12 +54,13 @@ void PingPongGame::GameplaySystemsSetup()
     auto& engine = Engine::Instance();
 
     engine.AddPausableSystem<SimpleCollisionsSystem>();
-    engine.AddPausableSystem<PingPongPlayerInputSystem>();
+    engine.AddSystem<PingPongPlayerInputSystem>();
     engine.AddPausableSystem<EyeSystem>();
     engine.AddPausableSystem<DamageSystem>();
     engine.AddPausableSystem<BulletSystem>();
     engine.AddPausableSystem<BarSystem>();
     engine.AddPausableSystem<DashSystem>();
+    engine.AddSystem<GameManagerSystem>();
 
 #if defined(DAGGER_DEBUG)
 
@@ -74,7 +77,6 @@ void PingPongGame::WorldSetup()
     camera->Update();
 
     SetupWorld();
-
     Engine::GetDefaultResource<Audio>()->PlayLoop("battle_music");
 }
 
@@ -95,13 +97,33 @@ void ping_pong::SetupWorld()
     constexpr float player_width = 32.f;
     constexpr float player_height = 48.f;
 
-//    float zPos = 1.f;
+    float zPos = 1.f;
 
     constexpr float Space = 0.1f;
 
-    float zPos = 0.f;
+//    float zPos = 1.f;
 
+    auto gameManagerEnt = reg.create();
+    auto& game = reg.emplace<GameManager>(gameManagerEnt);
+    auto ui = reg.create();
+    auto& text = reg.emplace<Text>(ui);
+    text.spacing = 0.6f;
+    text.Set("pixel-font", "");
+    game.text=ui;
 
+    auto scoreUi = reg.create();
+    auto& text2 = reg.emplace<Text>(scoreUi);
+    text2.spacing = 0.6f;
+    text2.Set("pixel-font", "");
+    game.scoreText=scoreUi;
+
+    auto bg = reg.create();
+    auto& spr = reg.emplace<Sprite>(bg);
+    game.bg = bg;
+    AssignSprite(spr,"EmptyWhitePixel");
+    spr.scale = {1000,1000};
+    spr.color = {0.f,0.f,0.f,1.f};
+    spr.position ={0,0,3};
 
     // player controller setup
     const Float32 playerSize = tileSize * ((height - 2) * (1 + Space) * 0.33f);
@@ -110,6 +132,7 @@ void ping_pong::SetupWorld()
     //1st player
     {
         auto entity = reg.create();
+        game.player = entity;
         auto& col = reg.emplace<SimpleCollision>(entity);
         col.size.x = 20;
         col.size.y = 20;
@@ -152,6 +175,7 @@ void ping_pong::SetupWorld()
     //Eye
     {
         auto entity = reg.create();
+        game.eye = entity;
         auto& col = reg.emplace<SimpleCollision>(entity);
         col.size.x = tileSize;
         col.size.y = tileSize;
@@ -166,7 +190,7 @@ void ping_pong::SetupWorld()
         auto& stats = reg.emplace<StatsData>(entity);
         stats.hp = 1e2;
 
-        createBar(&stats.hp, {0, 250, 0},400, 50, {1,0,0,1},stats.hp);
+        game.bossBar = createBar(&stats.hp, {0, 250, 0},400, 50, {1,0,0,1},stats.hp);
 
         auto& dmg = reg.emplace<Damageable>(entity);
         dmg.hurtDuration = .2f;
@@ -182,7 +206,6 @@ void ping_pong::SetupWorld()
         AnimatorPlay(anim, "bullet_hell:eye:IDLE");
 
     }
-
 
 
 

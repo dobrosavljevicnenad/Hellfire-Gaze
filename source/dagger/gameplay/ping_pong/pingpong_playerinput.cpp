@@ -10,6 +10,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "gameplay/common/simple_collisions.h"
 #include "core/graphics/animation.h"
+#include "bullethell_gamemanager.h"
 #include <GLFW/glfw3.h>
 
 using namespace dagger;
@@ -99,6 +100,26 @@ void PingPongPlayerInputSystem::OnKeyboardEvent(KeyboardEvent kEvent_)
         {
             ctrl_.eyeShoot = false;
         }
+
+        if (kEvent_.key == ctrl_.revive_key && (kEvent_.action == EDaggerInputState::Pressed ) &&
+            !ctrl_.revive)
+        {
+            ctrl_.revive = true;
+        }
+        else if (kEvent_.key == ctrl_.revive_key && kEvent_.action == EDaggerInputState::Released && ctrl_.revive)
+        {
+            ctrl_.revive = false;
+        }
+
+        if (kEvent_.key == ctrl_.next_round_key && (kEvent_.action == EDaggerInputState::Pressed ) &&
+            !ctrl_.next_round)
+        {
+            ctrl_.next_round = true;
+        }
+        else if (kEvent_.key == ctrl_.next_round_key && kEvent_.action == EDaggerInputState::Released && ctrl_.next_round)
+        {
+            ctrl_.next_round = false;
+        }
     });
 }
 
@@ -112,6 +133,26 @@ void PingPongPlayerInputSystem::Run()
         auto &mov = view.get<MovementData>(entity);
         auto& anim = view.get<Animator>(entity);
 
+        if(ctrl.revive){
+            ctrl.revive = false;
+            auto mgr_view = Engine::Registry().view<GameManager>();
+            for(auto mgr : mgr_view){
+                auto& manager = Engine::Registry().get<GameManager>(mgr);
+                if(manager.playerDead)
+                    manager.playerClickedPlayAgain = true;
+            }
+        }
+
+
+        if(ctrl.next_round){
+            ctrl.next_round = false;
+            auto mgr_view = Engine::Registry().view<GameManager>();
+            for(auto mgr : mgr_view){
+                auto& manager = Engine::Registry().get<GameManager>(mgr);
+                if(manager.eyeDead)
+                    manager.playerClickedNextRound = true;
+            }
+        }
         mov.acceleration += ctrl.input.x * s_PlayerSpeed * Engine::DeltaTime();
 
         if(mov.acceleration > mov.maxSpeed){

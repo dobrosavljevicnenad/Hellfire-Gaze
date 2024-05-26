@@ -22,16 +22,22 @@ namespace ping_pong
         EDaggerKeyboard left_key;
         EDaggerKeyboard right_key;
         EDaggerKeyboard eye_shoot;
+        EDaggerKeyboard revive_key;
+        EDaggerKeyboard next_round_key;
 
         Vector2 input{ 0, 0 };
         Vector2 doubleTap{0, 0};
         bool eyeShoot{false};
+        bool revive{false};
+        bool next_round{false};
         double last_clicked_left;
         double last_clicked_right;
     };
 
     struct StatsData{
         float hp{100};
+        float maxhp{100};
+        bool isDead{false};
     };
 
     class PingPongPlayerInputSystem
@@ -58,6 +64,8 @@ namespace ping_pong
             controllerMapping_.left_key = EDaggerKeyboard::KeyA;
             controllerMapping_.right_key = EDaggerKeyboard::KeyD;
             controllerMapping_.eye_shoot = EDaggerKeyboard::KeySpace;
+            controllerMapping_.revive_key = EDaggerKeyboard::KeyP;
+            controllerMapping_.next_round_key = EDaggerKeyboard::KeyN;
         }
 
         static void SetupPlayerTwoInput(ControllerMapping& controllerMapping_)

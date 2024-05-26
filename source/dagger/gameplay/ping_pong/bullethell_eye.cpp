@@ -89,7 +89,7 @@ void EyeSystem::Run() {
             int spawn_point_count;
             elapsed_time += Engine::DeltaTime();
 
-            if (EyeStats->hp > 80.f) {
+            if (EyeStats->hp / EyeStats->maxhp > .8f) {
                 if (elapsed_time >= 0.3) {
                     spawn_point_count= 24;
                     rotated_vector = rotateVector(rotated_vector, M_PI_2 / 6.f);
@@ -105,7 +105,7 @@ void EyeSystem::Run() {
 
                         float step = 2 * M_PI / spawn_point_count;
                         auto spawn_point = rotateVector(rotated_vector, i * M_PI_2);
-                        auto direction = Vector3(spawn_point, 0);
+                        auto direction = Vector3(spawn_point, 1);
                         float angle = angleBetweenVectors(spawn_point, fixed_vector);
 
                         transform.position = direction;
@@ -120,7 +120,7 @@ void EyeSystem::Run() {
                     elapsed_time = 0;
                 }
             }
-            if (EyeStats->hp >= 40 && EyeStats->hp <=80){
+            if (EyeStats->hp / EyeStats->maxhp>= .4f && EyeStats->hp / EyeStats->maxhp <=.8f){
                 if(elapsed_time >= 0.3){
                     spawn_point_count= 24;
                     rotated_vector = rotateVector(rotated_vector, M_PI_2 / 6.f);
@@ -134,7 +134,7 @@ void EyeSystem::Run() {
 
                         float step = 2 * M_PI / spawn_point_count;
                         auto spawn_point = rotateVector(rotated_vector, (M_PI_2 / 2.f) * i);
-                        auto spawn_point_3D = Vector3(spawn_point, 0);
+                        auto spawn_point_3D = Vector3(spawn_point, 1);
                         auto direction = spawn_point_3D;
                         float angle = angleBetweenVectors(spawn_point, fixed_vector);
 
@@ -150,7 +150,7 @@ void EyeSystem::Run() {
                     elapsed_time=0;
                 }
             }
-            if(EyeStats->hp < 40 && EyeStats->hp > 0){
+            if(EyeStats->hp / EyeStats->maxhp < .4f && EyeStats->hp / EyeStats->maxhp > .0f){
                 if(elapsed_time >= 0.3) {
                     spawn_point_count= 24;
                     rotated_vector = rotateVector(rotated_vector, M_PI_2 / 8.f);
@@ -164,7 +164,7 @@ void EyeSystem::Run() {
 
                         float step = 2 * M_PI / spawn_point_count;
                         auto spawn_point = rotateVector(rotated_vector,  (M_PI_2 / 6.f) * i);
-                        auto spawn_point_3D = Vector3(spawn_point, 0);
+                        auto spawn_point_3D = Vector3(spawn_point, 1);
                         auto direction = spawn_point_3D;
                         float angle = angleBetweenVectors(spawn_point, fixed_vector);
 
