@@ -14,6 +14,7 @@
 #include <iostream>
 #include "bullethell_eye.h"
 #include "gameplay/ping_pong/pingpong_playerinput.h"
+#include "bullethell_gamemanager.h"
 #include <cmath>
 
 using namespace ping_pong;
@@ -54,6 +55,7 @@ Vector2 fixed_vector(radius, 0.f);
 Vector2 rotated_vector = Vector2(radius,0.f);
 
 float elapsed_time = 0.f;
+float total_elapsed_time = 0.f;
 void EyeSystem::Run() {
     auto view = Engine::Registry().view<SimpleCollision,Transform, ControllerMapping, MovementData, Sprite, EyeTarget>();
     auto enemy = Engine::Registry().view<Eye, Sprite>();
@@ -86,99 +88,290 @@ void EyeSystem::Run() {
             auto &movData = playerView.get<MovementData>(playerView.front());
             auto EyeStats = Engine::Registry().try_get<StatsData>(eye);
 
+            auto manager_view = Engine::Registry().view<GameManager>();
+            auto &manager = manager_view.get<GameManager>(manager_view.front());
+
             int spawn_point_count;
             elapsed_time += Engine::DeltaTime();
+            total_elapsed_time += Engine::DeltaTime();
 
-            if (EyeStats->hp / EyeStats->maxhp > .8f) {
-                if (elapsed_time >= 0.3) {
-                    spawn_point_count= 24;
-                    rotated_vector = rotateVector(rotated_vector, M_PI_2 / 6.f);
-                    for (int i = 0; i < 4; i++) {
-                        auto bullet = reg.create();
-                        auto &bulletData = reg.emplace<Bullet>(bullet);
-                        auto &transform = reg.emplace<Transform>(bullet);
-                        auto &sprite = reg.emplace<Sprite>(bullet);
-                        auto &col = playerView.get<SimpleCollision>(playerView.front());
-                        reg.emplace<SimpleCollision>(bullet);
+            switch (manager.rounds) {
+                case 0:
+                    if (EyeStats->hp / EyeStats->maxhp > .8f) {
+                        if (elapsed_time >= 0.3) {
+                            spawn_point_count = 24;
+                            rotated_vector = rotateVector(rotated_vector, M_PI_2 / 6.2f);
+                            for (int i = 0; i < 4; i++) {
+                                auto bullet = reg.create();
+                                auto &bulletData = reg.emplace<Bullet>(bullet);
+                                auto &transform = reg.emplace<Transform>(bullet);
+                                auto &sprite = reg.emplace<Sprite>(bullet);
+                                auto &col = playerView.get<SimpleCollision>(playerView.front());
+                                reg.emplace<SimpleCollision>(bullet);
 
 
+                                float step = 2 * M_PI / spawn_point_count;
+                                auto spawn_point = rotateVector(rotated_vector, i * M_PI_2);
+                                auto direction = Vector3(spawn_point, 1);
+                                float angle = angleBetweenVectors(spawn_point, fixed_vector);
 
-                        float step = 2 * M_PI / spawn_point_count;
-                        auto spawn_point = rotateVector(rotated_vector, i * M_PI_2);
-                        auto direction = Vector3(spawn_point, 1);
-                        float angle = angleBetweenVectors(spawn_point, fixed_vector);
+                                transform.position = direction;
 
-                        transform.position = direction;
-
-                        bulletData.velocity = glm::normalize(direction);
-                        bulletData.velocity *= 200;
-                        bulletData.owner = eyeView.front();
-                        AssignSprite(sprite, "spritesheets:touhou:red_bullet");
-                        sprite.size = {3, 3};
-                        sprite.scale = {5, 5};
+                                bulletData.velocity = glm::normalize(direction);
+                                bulletData.velocity *= 200;
+                                bulletData.owner = eyeView.front();
+                                AssignSprite(sprite, "spritesheets:touhou:red_bullet");
+                                sprite.size = {3, 3};
+                                sprite.scale = {5, 5};
+                            }
+                            elapsed_time = 0;
+                        }
                     }
-                    elapsed_time = 0;
-                }
-            }
-            if (EyeStats->hp / EyeStats->maxhp>= .4f && EyeStats->hp / EyeStats->maxhp <=.8f){
-                if(elapsed_time >= 0.3){
-                    spawn_point_count= 24;
-                    rotated_vector = rotateVector(rotated_vector, M_PI_2 / 6.f);
-                    for(int i=0; i<8; i++) {
-                        auto bullet = reg.create();
-                        auto &bulletData = reg.emplace<Bullet>(bullet);
-                        auto &transform = reg.emplace<Transform>(bullet);
-                        auto &sprite = reg.emplace<Sprite>(bullet);
-                        auto &col = playerView.get<SimpleCollision>(playerView.front());
-                        reg.emplace<SimpleCollision>(bullet);
+                    if (EyeStats->hp / EyeStats->maxhp >= .4f && EyeStats->hp / EyeStats->maxhp <= .8f) {
+                        if (elapsed_time >= 0.3) {
+                            spawn_point_count = 24;
+                            rotated_vector = rotateVector(rotated_vector, M_PI_2 / 6.15f);
+                            for (int i = 0; i < 8; i++) {
+                                auto bullet = reg.create();
+                                auto &bulletData = reg.emplace<Bullet>(bullet);
+                                auto &transform = reg.emplace<Transform>(bullet);
+                                auto &sprite = reg.emplace<Sprite>(bullet);
+                                auto &col = playerView.get<SimpleCollision>(playerView.front());
+                                reg.emplace<SimpleCollision>(bullet);
 
-                        float step = 2 * M_PI / spawn_point_count;
-                        auto spawn_point = rotateVector(rotated_vector, (M_PI_2 / 2.f) * i);
-                        auto spawn_point_3D = Vector3(spawn_point, 1);
-                        auto direction = spawn_point_3D;
-                        float angle = angleBetweenVectors(spawn_point, fixed_vector);
+                                float step = 2 * M_PI / spawn_point_count;
+                                auto spawn_point = rotateVector(rotated_vector, (M_PI_2 / 2.f) * i);
+                                auto spawn_point_3D = Vector3(spawn_point, 1);
+                                auto direction = spawn_point_3D;
+                                float angle = angleBetweenVectors(spawn_point, fixed_vector);
 
-                        transform.position = spawn_point_3D;
+                                transform.position = spawn_point_3D;
 
-                        bulletData.velocity = glm::normalize(direction);
-                        bulletData.velocity *= 200;
-                        bulletData.owner = eyeView.front();
-                        AssignSprite(sprite, "spritesheets:touhou:red_bullet");
-                        sprite.size = {3, 3};
-                        sprite.scale = {5, 5};
+                                bulletData.velocity = glm::normalize(direction);
+                                bulletData.velocity *= 200;
+                                bulletData.owner = eyeView.front();
+                                AssignSprite(sprite, "spritesheets:touhou:red_bullet");
+                                sprite.size = {3, 3};
+                                sprite.scale = {5, 5};
+                            }
+                            elapsed_time = 0;
+                        }
                     }
-                    elapsed_time=0;
-                }
-            }
-            if(EyeStats->hp / EyeStats->maxhp < .4f && EyeStats->hp / EyeStats->maxhp > .0f){
-                if(elapsed_time >= 0.3) {
-                    spawn_point_count= 24;
-                    rotated_vector = rotateVector(rotated_vector, M_PI_2 / 8.f);
-                    for (int i = 0; i < 24; i++) {
-                        auto bullet = reg.create();
-                        auto &bulletData = reg.emplace<Bullet>(bullet);
-                        auto &transform = reg.emplace<Transform>(bullet);
-                        auto &sprite = reg.emplace<Sprite>(bullet);
-                        auto &col = playerView.get<SimpleCollision>(playerView.front());
-                        reg.emplace<SimpleCollision>(bullet);
+                    if (EyeStats->hp / EyeStats->maxhp < .4f && EyeStats->hp / EyeStats->maxhp > .0f) {
+                        if (elapsed_time >= 0.3) {
+                            spawn_point_count = 24;
+                            rotated_vector = rotateVector(rotated_vector, M_PI_2 / 8.f);
+                            for (int i = 0; i < 24; i++) {
+                                auto bullet = reg.create();
+                                auto &bulletData = reg.emplace<Bullet>(bullet);
+                                auto &transform = reg.emplace<Transform>(bullet);
+                                auto &sprite = reg.emplace<Sprite>(bullet);
+                                auto &col = playerView.get<SimpleCollision>(playerView.front());
+                                reg.emplace<SimpleCollision>(bullet);
 
-                        float step = 2 * M_PI / spawn_point_count;
-                        auto spawn_point = rotateVector(rotated_vector,  (M_PI_2 / 6.f) * i);
-                        auto spawn_point_3D = Vector3(spawn_point, 1);
-                        auto direction = spawn_point_3D;
-                        float angle = angleBetweenVectors(spawn_point, fixed_vector);
+                                float step = 2 * M_PI / spawn_point_count;
+                                auto spawn_point = rotateVector(rotated_vector, (M_PI_2 / 6.f) * i);
+                                auto spawn_point_3D = Vector3(spawn_point, 1);
+                                auto direction = spawn_point_3D;
+                                float angle = angleBetweenVectors(spawn_point, fixed_vector);
 
-                        transform.position = spawn_point_3D;
+                                transform.position = spawn_point_3D;
 
-                        bulletData.velocity = glm::normalize(direction);
-                        bulletData.velocity *= 200;
-                        bulletData.owner = eyeView.front();
-                        AssignSprite(sprite, "spritesheets:touhou:red_bullet");
-                        sprite.size = {3, 3};
-                        sprite.scale = {5, 5};
+                                bulletData.velocity = glm::normalize(direction);
+                                bulletData.velocity *= 200;
+                                bulletData.owner = eyeView.front();
+                                AssignSprite(sprite, "spritesheets:touhou:red_bullet");
+                                sprite.size = {3, 3};
+                                sprite.scale = {5, 5};
+                            }
+                            elapsed_time = 0;
+                        }
                     }
-                    elapsed_time=0;
-                }
+                    break;
+                case 1:
+                    if (EyeStats->hp / EyeStats->maxhp > .8f) {
+                        if (elapsed_time >= 0.1) {
+                            spawn_point_count= 24;
+                            rotated_vector = rotateVector(rotated_vector, M_PI_2 / 6.f);
+                            for (int i = 0; i < 4; i++) {
+                                auto bullet = reg.create();
+                                auto &bulletData = reg.emplace<Bullet>(bullet);
+                                auto &transform = reg.emplace<Transform>(bullet);
+                                auto &sprite = reg.emplace<Sprite>(bullet);
+                                auto &col = playerView.get<SimpleCollision>(playerView.front());
+                                reg.emplace<SimpleCollision>(bullet);
+
+
+
+                                float step = 2 * M_PI / spawn_point_count;
+                                auto spawn_point = rotateVector(rotated_vector, i * M_PI_2 + ((rand() % 4) + 1));
+                                auto direction = Vector3(spawn_point, 0);
+                                float angle = angleBetweenVectors(spawn_point, fixed_vector);
+
+                                transform.position = direction;
+
+                                bulletData.velocity = glm::normalize(direction);
+                                bulletData.velocity *= 100;
+                                bulletData.owner = eyeView.front();
+                                AssignSprite(sprite, "spritesheets:touhou:red_bullet");
+                                sprite.size = {3, 3};
+                                sprite.scale = {5, 5};
+                            }
+                            elapsed_time = 0;
+                        }
+                    }
+                    if (EyeStats->hp / EyeStats->maxhp >= .4f && EyeStats->hp / EyeStats->maxhp <= .8f) {
+                        if (elapsed_time >= 0.2f) {
+                            spawn_point_count= 24;
+                            rotated_vector = rotateVector(rotated_vector, M_PI_2 / 6.f);
+                            for (int i = 0; i < 4; i++) {
+                                for (int k = 1; k <= 3; k++) {
+                                    auto bullet = reg.create();
+                                    auto &bulletData = reg.emplace<Bullet>(bullet);
+                                    auto &transform = reg.emplace<Transform>(bullet);
+                                    auto &sprite = reg.emplace<Sprite>(bullet);
+                                    auto &col = playerView.get<SimpleCollision>(playerView.front());
+                                    reg.emplace<SimpleCollision>(bullet);
+
+
+                                    float step = 2 * M_PI / spawn_point_count;
+                                    auto spawn_point = rotateVector(rotated_vector, i * M_PI_2 + 5*k);
+                                    auto direction = Vector3(spawn_point, 0);
+                                    float angle = angleBetweenVectors(spawn_point, fixed_vector);
+
+                                    transform.position = direction;
+
+                                    bulletData.velocity = glm::normalize(direction);
+                                    bulletData.velocity *= 200;
+                                    bulletData.owner = eyeView.front();
+                                    AssignSprite(sprite, "spritesheets:touhou:red_bullet");
+                                    sprite.size = {3, 3};
+                                    sprite.scale = {5, 5};
+                                }
+                                elapsed_time = 0;
+                            }
+                        }
+                    }
+                    if (EyeStats->hp / EyeStats->maxhp < .4f && EyeStats->hp / EyeStats->maxhp > .0f) {
+                        if (elapsed_time > 0.4f) {
+                            for (int i = 0; i < 24; i++) {
+                                rotated_vector = rotateVector(rotated_vector, M_PI_2 / 6.f + (int)total_elapsed_time);
+                                spawn_point_count = 24;
+                                auto bullet = reg.create();
+                                auto &bulletData = reg.emplace<Bullet>(bullet);
+                                auto &transform = reg.emplace<Transform>(bullet);
+                                auto &sprite = reg.emplace<Sprite>(bullet);
+                                auto &col = playerView.get<SimpleCollision>(playerView.front());
+                                reg.emplace<SimpleCollision>(bullet);
+
+
+                                float step = 2 * M_PI / spawn_point_count;
+                                auto spawn_point = rotateVector(rotated_vector, i*M_PI_2);
+                                auto direction = Vector3(spawn_point, 0);
+                                float angle = angleBetweenVectors(spawn_point, fixed_vector);
+
+                                transform.position = direction;
+
+                                bulletData.velocity = glm::normalize(direction);
+                                bulletData.velocity *= 100;
+                                bulletData.owner = eyeView.front();
+                                AssignSprite(sprite, "spritesheets:touhou:red_bullet");
+                                sprite.size = {3, 3};
+                                sprite.scale = {5, 5};
+                                elapsed_time = 0;
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    if (EyeStats->hp / EyeStats->maxhp > .8f) {
+                        if (elapsed_time >= 0.15) {
+                            spawn_point_count= 24;
+                            rotated_vector = rotateVector(rotated_vector, M_PI_2 / 6.f + 2.f);
+                            for(int i=0; i<8; i++) {
+                                auto bullet = reg.create();
+                                auto &bulletData = reg.emplace<Bullet>(bullet);
+                                auto &transform = reg.emplace<Transform>(bullet);
+                                auto &sprite = reg.emplace<Sprite>(bullet);
+                                auto &col = playerView.get<SimpleCollision>(playerView.front());
+                                reg.emplace<SimpleCollision>(bullet);
+
+                                float step = 2 * M_PI / spawn_point_count;
+                                auto spawn_point = rotateVector(rotated_vector, i * M_PI_2/2);
+                                auto direction = Vector3(spawn_point, 0);
+                                float angle = angleBetweenVectors(spawn_point, fixed_vector);
+
+                                transform.position = direction;
+
+                                bulletData.velocity = glm::normalize(direction);
+                                bulletData.velocity *= 200;
+                                bulletData.owner = eyeView.front();
+                                AssignSprite(sprite, "spritesheets:touhou:red_bullet");
+                                sprite.size = {3, 3};
+                                sprite.scale = {5, 5};
+                            }
+                            elapsed_time = 0;
+                        }
+                    }
+                    if (EyeStats->hp / EyeStats->maxhp >= .4f && EyeStats->hp / EyeStats->maxhp <= .8f) {
+                        if (elapsed_time >= 0.1) {
+                            spawn_point_count= 24;
+                            rotated_vector = rotateVector(rotated_vector, M_PI_2 / 6.73f);
+                            for(int i=0; i<8; i++) {
+                                auto bullet = reg.create();
+                                auto &bulletData = reg.emplace<Bullet>(bullet);
+                                auto &transform = reg.emplace<Transform>(bullet);
+                                auto &sprite = reg.emplace<Sprite>(bullet);
+                                auto &col = playerView.get<SimpleCollision>(playerView.front());
+                                reg.emplace<SimpleCollision>(bullet);
+
+                                float step = 2 * M_PI / spawn_point_count;
+                                auto spawn_point = rotateVector(rotated_vector, i * M_PI_2/2);
+                                auto direction = Vector3(spawn_point, 0);
+                                float angle = angleBetweenVectors(spawn_point, fixed_vector);
+
+                                transform.position = direction;
+
+                                bulletData.velocity = glm::normalize(direction);
+                                bulletData.velocity *= 200;
+                                bulletData.owner = eyeView.front();
+                                AssignSprite(sprite, "spritesheets:touhou:red_bullet");
+                                sprite.size = {3, 3};
+                                sprite.scale = {5, 5};
+                            }
+                            elapsed_time = 0;
+                        }
+                    }
+                    if (EyeStats->hp / EyeStats->maxhp < .4f && EyeStats->hp / EyeStats->maxhp > .0f) {
+                        if (elapsed_time > 0.3f) {
+                            for (int i = 0; i < 24; i++) {
+                                rotated_vector = rotateVector(rotated_vector, M_PI_2 / 6.f + (int)total_elapsed_time);
+                                spawn_point_count = 24;
+                                auto bullet = reg.create();
+                                auto &bulletData = reg.emplace<Bullet>(bullet);
+                                auto &transform = reg.emplace<Transform>(bullet);
+                                auto &sprite = reg.emplace<Sprite>(bullet);
+                                auto &col = playerView.get<SimpleCollision>(playerView.front());
+                                reg.emplace<SimpleCollision>(bullet);
+
+
+                                float step = 2 * M_PI / spawn_point_count;
+                                auto spawn_point = rotateVector(rotated_vector, i*M_PI_2);
+                                auto direction = Vector3(spawn_point, 0);
+                                float angle = angleBetweenVectors(spawn_point, fixed_vector);
+
+                                transform.position = direction;
+
+                                bulletData.velocity = glm::normalize(direction);
+                                bulletData.velocity *= 100;
+                                bulletData.owner = eyeView.front();
+                                AssignSprite(sprite, "spritesheets:touhou:red_bullet");
+                                sprite.size = {3, 3};
+                                sprite.scale = {5, 5};
+                                elapsed_time = 0;
+                            }
+                        }
+                    }
             }
         }
     }
